@@ -1,14 +1,25 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
+# Set non-interactive frontend for apt
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     python3.10 \
     python3-pip \
-    git 
+    git \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install PyYAML
+# Install Python dependencies
+RUN pip3 install --no-cache-dir PyYAML
 
-COPY feed.py /usr/bin/feed.py 
+# Copy Python script
+COPY feed.py /usr/bin/feed.py
 
-COPY  entrypoint.sh /entrypoint.sh
+# Copy and set entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+# Set entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
